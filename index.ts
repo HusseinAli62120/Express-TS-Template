@@ -2,14 +2,13 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cors from "cors";
 import express from "express";
-import envPath from "./utils/checkEnvironment";
 import authRoutes from "./routes/auth";
 
 // Define the app
 const app = express();
 
 // Set up the environment variables
-dotenv.config({ path: `./${envPath}` });
+dotenv.config();
 
 app.use(express.json());
 
