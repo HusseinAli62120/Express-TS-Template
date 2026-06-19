@@ -1,5 +1,6 @@
 # Express-Typescript-Template
 
+
 This is a backend template for Node.js using Express with TypeScript, to ease the setup of a backend project. It also comes with script-based environment detection and the following packages:
 
 - nodemon
@@ -8,6 +9,8 @@ This is a backend template for Node.js using Express with TypeScript, to ease th
 - cors
 - cookie-parser
 - bcrypt
+
+📌 Note that the ‘main’ branch does not offer any ORM or authentication approach, although there is a middleware for JWT auth, which you can delete if you are using another approach 
 
 ### Getting Started:
 
@@ -21,12 +24,9 @@ To use this template, fork the repo or use this template. Then, once you have it
     2. To run the development environment but with the testing variables (use .env.testing)
     run: **`npm run test`  
     📌** Use this to test the testing environment.
-    3. To deploy the backend with the testing variables (use .env.testing)
-    run: **`npm run start:test`  
-    📌** Use this if you have a backend deployed only for testing.
-    4. To deploy the backend with the production variables (use .env.production)
+    3. To build
     run: **`npm build`  
-    📌** Use this when deploying the backend.
+    📌** Use this when deploying the backend, and add your variables (test/production in your deployment environment)  
 
 📌 Make sure to read the notes below.
 
@@ -40,21 +40,22 @@ The template also comes with the following directories:
 📌 Delete the test route.
 - **controllers:** for route logic (Currently holds a test login, logout, and test functions)  
 📌 Add your logic to the login, logout functions and delete the test one.
-- **middlewares:** for middleware definition. (Currently holds an authentication middleware)
+- **middlewares:** for middleware definition. 
+(Currently holds an authentication middleware for JWT auth)
 - **types:** for type definitions
-- **utils:** for utility functions (currently holds “checkEnvironment.ts”)
+- **utils:** for utility functions
 
 ---
 
 ### Some Notes:
 
-- **This template already has three .env files,** but when you’re actually using it, make sure to uncomment the first line in **.gitignore** to avoid accidentally pushing your .env files.
+- This template already has three .env files, but when you’re actually using it, make sure to uncomment the first line in **.gitignore** to avoid accidentally pushing your .env files.
 - If your backend does not have authentication (login, logout, etc.) you can delete the following:
     - **requestWithUser** type in the types directory.
     - **authMiddleware** in middlewares directory.
-    - And you can also uninstall **bcrypt** and **jsonwebtoken** and their types   (in devDependencies) if you don’t need them.
+    - And you can also uninstall **bcrypt** and **jsonwebtoken** and their types 
+    (in devDependencies) ****if you don’t need them.
 - In the .env files
     - **The BACKEND_URL & PORT** are used only by the **app.listen** to display the environment on running the app. But they are not used in any logic. So don’t worry to much about them.
-    - **Do not add NODE_ENV to any .env file, since it is added on run by the cross-env package.**
-    - Change the token secrets into something random, open a gitBash terminal and run:  
+    - Change the token secrets into something random, open a gitBash terminal and run:
     `head -c 64 /dev/urandom | base64`
