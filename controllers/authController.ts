@@ -1,8 +1,6 @@
 import express from "express";
-import { prisma } from "../utils/prismaClient";
-import bcrypt from "bcrypt";
-import { Role } from "../utils/values";
-
+import { auth } from "../utils/auth";
+import { isAPIError } from "better-auth/api";
 // Test
 const testController = async (req: express.Request, res: express.Response) => {
   try {
@@ -18,44 +16,51 @@ const testController = async (req: express.Request, res: express.Response) => {
 // Signup
 const signup = async (req: express.Request, res: express.Response) => {
   try {
-    const { userName, password } = req.body;
+    const { userName, password, name } = req.body;
 
-    if (!userName || !password) {
+    if (!userName || !password || !name) {
       return res.status(400).json({ message: "Bad Request Parameters" });
     }
 
     // Check if the user already exists
-    const user = await prisma.user.findUnique({
-      where: {
-        userName,
+    const response = await auth.api.isUsernameAvailable({
+      body: {
+        username: userName,
       },
     });
 
-    if (user) {
-      return res.status(409).json({ message: "User Already Exists" });
+    // Not available to be created, so already exists
+    if (!response.available) {
+      return res.status(409).json({ message: "Username Already Exists" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // If you want an actual email, have the user provide it in the frontend and pass it instead.
+    // Generate a unique email using Date.now()
+    const dummyEmail = `dummyEmail-${userName}-${Date.now()}@domain.com`;
 
-    // Create user with default role of USER
-    const createdUser = await prisma.user.create({
-      data: {
-        userName: userName,
-        password: hashedPassword,
-        role: Role.USER,
+    const user = await auth.api.signUpEmail({
+      body: {
+        email: dummyEmail,
+        name: name,
+        password: password,
+        username: userName,
       },
     });
 
     return res.status(200).json({
       message: "User Created successfully",
-      user: {
-        id: createdUser.id,
-        userName: createdUser.userName,
-        role: createdUser.role,
-      },
+      user: user,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.log(error);
+
+    // Check if the error was thrown directly by Better Auth
+    if (isAPIError(error)) {
+      const authError = error as any;
+      return res.status(authError?.statusCode || 500).json({
+        message: authError.body.message,
+      });
+    }
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -64,40 +69,44 @@ const signup = async (req: express.Request, res: express.Response) => {
 const login = async (req: express.Request, res: express.Response) => {
   try {
     const { userName, password } = req.body;
+    console.log(userName, password);
 
     if (!userName || !password) {
       return res.status(400).json({ message: "Bad Request Parameters" });
     }
 
     // Check if the user exists
-    const user = await prisma.user.findUnique({
-      where: {
-        userName,
+    const isAvailable = await auth.api.isUsernameAvailable({
+      body: {
+        username: userName,
       },
     });
 
-    if (!user) {
-      return res.status(404).json({ message: "User Not Found" });
+    // Since it is available to be created, that means there is no user with such name.
+    if (isAvailable?.available) {
+      return res.status(400).json({ message: "Username Not Found" });
     }
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
-
-    if (!passwordMatch) {
-      return res
-        .status(401)
-        .json({ message: "Incorrect Username or Password" });
-    }
+    const user = await auth.api.signInUsername({
+      body: {
+        username: userName,
+        password: password,
+      },
+    });
 
     return res.status(200).json({
       message: "Login Sucessful",
-      user: {
-        id: user.id,
-        userName: user.userName,
-        role: user.role,
-      },
+      user: user,
     });
   } catch (error) {
     console.log(error);
+
+    if (isAPIError(error)) {
+      const authError = error as any;
+      return res.status(authError?.statusCode || 500).json({
+        message: authError.body.message,
+      });
+    }
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

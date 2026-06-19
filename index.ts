@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 import cors from "cors";
 import express from "express";
 import authRoutes from "./routes/auth";
+import { auth } from "./utils/auth";
+import { toNodeHandler } from "better-auth/node";
 
 // Define the app
 const app = express();
@@ -20,6 +22,8 @@ app.use(
   }),
 );
 
+// Better Auth handles its own parsing, mount its handler directly
+app.all("/api/auth/{*any}", toNodeHandler(auth));
 // To use HTTP cookies
 app.use(cookieParser());
 

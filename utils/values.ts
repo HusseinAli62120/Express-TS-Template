@@ -3,3 +3,5 @@ export const enum Role {
   ADMIN = "ADMIN",
   SUPER_ADMIN = "SUPER_ADMIN",
 }
+
+export const validationRegex = /^[a-zA-Z0-9_-]+$/;
