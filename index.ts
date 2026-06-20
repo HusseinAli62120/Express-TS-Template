@@ -2,8 +2,8 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cors from "cors";
 import express from "express";
-import authRoutes from "./routes/auth";
 import { auth } from "./utils/auth";
+import testRoutes from "./routes/test";
 import { toNodeHandler } from "better-auth/node";
 
 // Define the app
@@ -34,7 +34,7 @@ app.get("/", (req, res) => {
 const port = process.env.PORT;
 
 // Routes
-app.use("/auth", authRoutes);
+app.use("/test", testRoutes);
 
 // Start the app
 app.listen(port, () => {

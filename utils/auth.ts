@@ -24,6 +24,7 @@ export const auth = betterAuth({
       },
     }),
   ],
+  trustedOrigins: [process?.env?.FRONTEND_URL!],
   //   Add our additional attributes into the Better auth session context
   user: {
     additionalFields: {
