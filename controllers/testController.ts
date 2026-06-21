@@ -1,7 +1,7 @@
 import express from "express";
-import { auth } from "../utils/auth";
+import { RequestWithUser } from "../types/requestWithUser";
 // Test
-const testController = async (req: express.Request, res: express.Response) => {
+const testController = async (req: RequestWithUser, res: express.Response) => {
   try {
     return res
       .status(200)
