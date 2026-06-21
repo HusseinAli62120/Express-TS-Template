@@ -6,6 +6,5 @@ node_modules
 dist
 *.log
 .vscode
-
-
 /generated/prisma
+generated/
